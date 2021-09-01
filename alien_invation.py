@@ -24,7 +24,7 @@ class AlienInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption('Alien Invasion')
 
-        # Create an instanace to store game statistics.
+        # Create an instance to store game statistics.
         self.stats = GameStats(self)
 
         self.ship = Ship(self)
@@ -72,7 +72,8 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
         elif event.key == pygame.K_p:
-            self._start_game()
+            if not self.stats.game_active:
+                self._start_game()
 
     def _check_keyup_events(self, event):
         """Respond to keypresses."""
@@ -90,21 +91,20 @@ class AlienInvasion:
 
     def _start_game(self):
         """Start a new game."""
-        if not self.stats.game_active:
-            # Reset the game statistics.
-            self.stats.reset_stats()
-            self.stats.game_active = True
+        # Reset the game statistics.
+        self.stats.reset_stats()
+        self.stats.game_active = True
 
-            # Get rid of any remiaining aliens and bullet.
-            self.aliens.empty()
-            self.bullets.empty()
+        # Get rid of any remiaining aliens and bullet.
+        self.aliens.empty()
+        self.bullets.empty()
 
-            # Create a new fleet and center the ship
-            self._create_fleet()
-            self.ship.center_ship()
+        # Create a new fleet and center the ship
+        self._create_fleet()
+        self.ship.center_ship()
 
-            # Hide the mouse cursor.
-            pygame.mouse.set_visible(False)
+        # Hide the mouse cursor.
+        pygame.mouse.set_visible(False)
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
@@ -146,7 +146,7 @@ class AlienInvasion:
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
 
-        # Loof for aliens hitting the bottom of the screen.
+        # Loop for aliens hitting the bottom of the screen.
         self._check_aliens_bottom()
 
     def _ship_hit(self):
