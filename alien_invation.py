@@ -35,8 +35,6 @@ class AlienInvasion:
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
 
-        # self._create_fleet()
-
         # Make the Play button.
         self.play_button = Button(self)
         # Make the Level Button.
@@ -66,8 +64,7 @@ class AlienInvasion:
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                self._check_mousebuttomdown_events(mouse_pos)
+                self._check_mousebuttomdown_events()
 
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
@@ -90,28 +87,29 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
-    def _check_mousebuttomdown_events(self, mouse_pos):
-        self._check_level_selected(mouse_pos)
-        self._check_play_button(mouse_pos)
+    def _check_mousebuttomdown_events(self):
+        mouse_pos = pygame.mouse.get_pos()
+        if not self.stats.game_active:
+            self._check_level_selected(mouse_pos)
+            self._check_play_button(mouse_pos)
 
     def _check_level_selected(self, mouse_pos):
         basic_button_clicked = self.basic_button.image_rect.collidepoint(mouse_pos)
         medium_button_clicked = self.medium_button.image_rect.collidepoint(mouse_pos)
         hard_button_clicked = self.hard_button.image_rect.collidepoint(mouse_pos)
 
-        if not self.stats.game_active:
-            if basic_button_clicked:
+        if basic_button_clicked:
                 self.level_selected = 1
-            elif medium_button_clicked:
+        elif medium_button_clicked:
                 self.level_selected = 2
-            elif hard_button_clicked:
+        elif hard_button_clicked:
                 self.level_selected = 3
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
         play_button_clicked = self.play_button.image_rect.collidepoint(mouse_pos)
 
-        if play_button_clicked and not self.stats.game_active and self.level_selected:
+        if play_button_clicked and self.level_selected:
             self._start_game()
 
     def _start_game(self):
