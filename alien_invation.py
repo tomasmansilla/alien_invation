@@ -98,11 +98,11 @@ class AlienInvasion:
         hard_button_clicked = self.hard_button.image_rect.collidepoint(mouse_pos)
 
         if basic_button_clicked:
-                self.settings.level = 1
+            self.settings.level = 1
         elif medium_button_clicked:
-                self.settings.level = 2
+            self.settings.level = 2
         elif hard_button_clicked:
-                self.settings.level = 3
+            self.settings.level = 3
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
@@ -117,8 +117,16 @@ class AlienInvasion:
         self.stats.reset_stats()
         self.settings.initialize_dynamic_settings()
         self.stats.game_active = True
+
         self.sb.prep_score()
         self.sb.prep_level()
+
+        self._set_started_position()
+
+        # Hide the mouse cursor.
+        pygame.mouse.set_visible(False)
+
+    def _set_started_position(self):
         self.sb.prep_ships()
 
         # Get rid of any remaining aliens and bullet.
@@ -128,9 +136,6 @@ class AlienInvasion:
         # Create a new fleet and center the ship
         self._create_fleet()
         self.ship.center_ship()
-
-        # Hide the mouse cursor.
-        pygame.mouse.set_visible(False)
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
@@ -162,14 +167,18 @@ class AlienInvasion:
             self.sb.check_high_score()
 
         if not self.aliens:
-            # Destroy existing bullets and create new fleet.
-            self.bullets.empty()
-            self._create_fleet()
-            self.settings.increase_speed()
+            self._new_level()
 
-            # Increase level
-            self.stats.level += 1
-            self.sb.prep_level()
+    def _new_level(self):
+        """Destroy existing bullets and create new fleet."""
+        # Destroy existing bullets and create new fleet.
+        self.bullets.empty()
+        self._create_fleet()
+        self.settings.increase_speed()
+
+        # Increase level
+        self.stats.level += 1
+        self.sb.prep_level()
 
     def _update_aliens(self):
         """
@@ -192,15 +201,8 @@ class AlienInvasion:
         if self.stats.ship_left > 0:
             # Decrement ship_left, and update scoreboard.
             self.stats.ship_left -= 1
-            self.sb.prep_ships()
 
-            # Get rid of any remaining aliens and bullets.
-            self.aliens.empty()
-            self.bullets.empty()
-
-            # Create a new fleet and center the ship.
-            self._create_fleet()
-            self.ship.center_ship()
+            self._set_started_position()
 
             # Pause
             sleep(0.5)
@@ -244,11 +246,12 @@ class AlienInvasion:
         alien_width, alien_height = alien.rect.size
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
-        alien.rect.y = alien_height + 2 * alien.rect.height * row_number
+        alien.y = alien_height + 2 * alien.rect.height * row_number
+        alien.rect.y = alien.y
         self.aliens.add(alien)
 
     def _check_fleet_edges(self):
-        """Respond approprietely if any aliens have reached an edge."""
+        """Respond appropriately if any aliens have reached an edge."""
         for alien in self.aliens.sprites():
             if alien.check_edges():
                 self._change_fleet_direction()
@@ -273,13 +276,17 @@ class AlienInvasion:
 
         # Draw the play button if the game is inactive.
         if not self.stats.game_active:
-            self.play_button.draw_button()
-            if not self.settings.level:
-                self.basic_button.draw_button()
-                self.medium_button.draw_button()
-                self.hard_button.draw_button()
+            self._draw_buttons()
 
         pygame.display.flip()
+
+    def _draw_buttons(self):
+        """Draw the play and level buttons."""
+        self.play_button.draw_button()
+        if not self.settings.level:
+            self.basic_button.draw_button()
+            self.medium_button.draw_button()
+            self.hard_button.draw_button()
 
     def _exit(self):
         """Manege the exit of the game."""
