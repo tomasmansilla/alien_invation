@@ -1,11 +1,13 @@
 import sys
 import pygame
 from time import sleep
+import pygame.mixer
 
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
 from button import Button, LevelButton
+from sound import Sound
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
@@ -40,6 +42,9 @@ class AlienInvasion:
         self.basic_button = LevelButton(self, 'images/easy.bmp', 1)
         self.medium_button = LevelButton(self, 'images/normal.bmp', 2)
         self.hard_button = LevelButton(self, 'images/hard.bmp', 3)
+
+        # Music
+        self.sound = Sound()
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -98,10 +103,13 @@ class AlienInvasion:
         hard_button_clicked = self.hard_button.image_rect.collidepoint(mouse_pos)
 
         if basic_button_clicked:
+            self.sound.button_sound()
             self.settings.level = 1
         elif medium_button_clicked:
+            self.sound.button_sound()
             self.settings.level = 2
         elif hard_button_clicked:
+            self.sound.button_sound()
             self.settings.level = 3
 
     def _check_play_button(self, mouse_pos):
@@ -109,6 +117,7 @@ class AlienInvasion:
         play_button_clicked = self.play_button.image_rect.collidepoint(mouse_pos)
 
         if play_button_clicked and self.settings.level:
+            self.sound.button_sound()
             self._start_game()
 
     def _start_game(self):
@@ -141,6 +150,7 @@ class AlienInvasion:
         """Create a new bullet and add it to the bullets group."""
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
+            self.sound.shot_sound()
             self.bullets.add(new_bullet)
 
     def _update_bullets(self):
@@ -167,6 +177,7 @@ class AlienInvasion:
             self.sb.check_high_score()
 
         if not self.aliens:
+            self.sound.destroy_sound()
             self._new_level()
 
     def _new_level(self):
@@ -203,6 +214,8 @@ class AlienInvasion:
             self.stats.ship_left -= 1
 
             self._set_started_position()
+
+            self.sound.game_over_sound()
 
             # Pause
             sleep(0.5)
