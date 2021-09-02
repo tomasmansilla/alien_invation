@@ -29,7 +29,6 @@ class AlienInvasion:
         # and create a scoreboard.
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
-        self.level_selected = self.settings.level
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -99,24 +98,24 @@ class AlienInvasion:
         hard_button_clicked = self.hard_button.image_rect.collidepoint(mouse_pos)
 
         if basic_button_clicked:
-                self.level_selected = 1
+                self.settings.level = 1
         elif medium_button_clicked:
-                self.level_selected = 2
+                self.settings.level = 2
         elif hard_button_clicked:
-                self.level_selected = 3
+                self.settings.level = 3
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
         play_button_clicked = self.play_button.image_rect.collidepoint(mouse_pos)
 
-        if play_button_clicked and self.level_selected:
+        if play_button_clicked and self.settings.level:
             self._start_game()
 
     def _start_game(self):
         """Start a new game."""
         # Reset the game statistics.
         self.stats.reset_stats()
-        self.settings.initialize_dynamic_settings(self.level_selected)
+        self.settings.initialize_dynamic_settings()
         self.stats.game_active = True
         self.sb.prep_score()
         self.sb.prep_level()
@@ -207,7 +206,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.stats.game_active = False
-            self.level_selected = 0
+            self.settings.level = 0
             pygame.mouse.set_visible(True)
 
     def _check_aliens_bottom(self):
@@ -275,7 +274,7 @@ class AlienInvasion:
         # Draw the play button if the game is inactive.
         if not self.stats.game_active:
             self.play_button.draw_button()
-            if not self.level_selected:
+            if not self.settings.level:
                 self.basic_button.draw_button()
                 self.medium_button.draw_button()
                 self.hard_button.draw_button()
