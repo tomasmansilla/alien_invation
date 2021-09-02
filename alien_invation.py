@@ -29,21 +29,20 @@ class AlienInvasion:
         # and create a scoreboard.
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
-
         self.level_selected = self.settings.level
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
 
-        self._create_fleet()
+        # self._create_fleet()
 
         # Make the Play button.
-        self.play_button = Button(self, 'Play')
+        self.play_button = Button(self)
         # Make the Level Button.
-        self.basic_button = LevelButton(self, 'basic', 1)
-        self.medium_button = LevelButton(self, 'medium', 2)
-        self.hard_button = LevelButton(self, 'hard', 3)
+        self.basic_button = LevelButton(self, 'images/easy.bmp', 1)
+        self.medium_button = LevelButton(self, 'images/normal.bmp', 2)
+        self.hard_button = LevelButton(self, 'images/hard.bmp', 3)
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -96,9 +95,9 @@ class AlienInvasion:
         self._check_play_button(mouse_pos)
 
     def _check_level_selected(self, mouse_pos):
-        basic_button_clicked = self.basic_button.rect.collidepoint(mouse_pos)
-        medium_button_clicked = self.medium_button.rect.collidepoint(mouse_pos)
-        hard_button_clicked = self.hard_button.rect.collidepoint(mouse_pos)
+        basic_button_clicked = self.basic_button.image_rect.collidepoint(mouse_pos)
+        medium_button_clicked = self.medium_button.image_rect.collidepoint(mouse_pos)
+        hard_button_clicked = self.hard_button.image_rect.collidepoint(mouse_pos)
 
         if not self.stats.game_active:
             if basic_button_clicked:
@@ -110,7 +109,7 @@ class AlienInvasion:
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
-        play_button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        play_button_clicked = self.play_button.image_rect.collidepoint(mouse_pos)
 
         if play_button_clicked and not self.stats.game_active and self.level_selected:
             self._start_game()
