@@ -1,6 +1,7 @@
 import sys
 import pygame
 from time import sleep
+import json
 
 from settings import Settings
 from game_stats import GameStats
@@ -95,13 +96,6 @@ class AlienInvasion:
         self._check_level_selected(mouse_pos)
         self._check_play_button(mouse_pos)
 
-    def _check_play_button(self, mouse_pos):
-        """Start a new game when the player clicks Play."""
-        play_button_clicked = self.play_button.rect.collidepoint(mouse_pos)
-
-        if play_button_clicked and not self.stats.game_active and self.level_selected:
-            self._start_game()
-
     def _check_level_selected(self, mouse_pos):
         basic_button_clicked = self.basic_button.rect.collidepoint(mouse_pos)
         medium_button_clicked = self.medium_button.rect.collidepoint(mouse_pos)
@@ -114,6 +108,13 @@ class AlienInvasion:
                 self.level_selected = 2
             elif hard_button_clicked:
                 self.level_selected = 3
+
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        play_button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+
+        if play_button_clicked and not self.stats.game_active and self.level_selected:
+            self._start_game()
 
     def _start_game(self):
         """Start a new game."""
@@ -163,7 +164,7 @@ class AlienInvasion:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
-            self.sb.chech_high_score()
+            self.sb.check_high_score()
 
         if not self.aliens:
             # Destroy existing bullets and create new fleet.
