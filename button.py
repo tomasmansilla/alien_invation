@@ -31,3 +31,23 @@ class Button:
         # Draw blank button and then draw message.
         self.screen.fill(self.button_color, self.rect)
         self.screen.blit(self.msg_image, self.msg_image_rect)
+
+
+class LevelButton(Button):
+    """Initialize the buttom attributes."""
+
+    def __init__(self, game, msg, position):
+        super().__init__(game, msg)
+        self.position = position
+
+        if position == 1:
+            self.rect.y = (self.screen_rect.height // 2) + self.height
+            self.rect.x = (self.screen_rect.width // 2) - 300
+        elif position == 2:
+            self.rect.y = (self.screen_rect.height // 2) + self.height
+            self.rect.x = (self.screen_rect.width // 2) - 100
+        else:
+            self.rect.y = (self.screen_rect.height // 2) + self.height
+            self.rect.x = (self.screen_rect.width // 2) + 100
+
+        self._prep_msg(msg)
