@@ -2,6 +2,7 @@ import sys
 import pygame
 from time import sleep
 import pygame.mixer
+from random import randint
 
 from settings import Settings
 from game_stats import GameStats
@@ -52,11 +53,13 @@ class AlienInvasion:
         # Music
         self.sound = Sound()
 
+        # Determine how many aliens enter on the screen.
+        self._determine_aliens_enter()
+
     def run_game(self):
         """Start the main loop for the game."""
         while True:
             self._check_events()
-
             if self.stats.game_active:
                 self.ship.update()
                 self._update_bullets()
@@ -78,14 +81,24 @@ class AlienInvasion:
 
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
-        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-            self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
-            self.ship.moving_left = True
-        elif event.key == pygame.K_q:
+        if self.stats.game_active and not self.pause_game:
+            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                self.ship.moving_right = True
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                self.ship.moving_left = True
+            elif event.key == pygame.K_SPACE:
+                self._fire_bullet()
+            elif event.key == pygame.K_r:
+
+                self.bullets.empty()
+                self.aliens.empty()
+
+                self.stats.game_active = False
+                self.settings.level = 0
+                pygame.mouse.set_visible(True)
+
+        if event.key == pygame.K_q:
             self._exit()
-        elif event.key == pygame.K_SPACE:
-            self._fire_bullet()
         elif event.key == pygame.K_p:
             if not self.stats.game_active and not self.pause_game:
                 self._start_game()
@@ -93,18 +106,9 @@ class AlienInvasion:
                 self._pause_game()
             elif self.pause_game:
                 self._resume_game()
-
         elif event.key == pygame.K_ESCAPE:
             if not self.minimize_screen:
                 self._minimize_screen()
-        elif event.key == pygame.K_r:
-
-            self.bullets.empty()
-            self.aliens.empty()
-
-            self.stats.game_active = False
-            self.settings.level = 0
-            pygame.mouse.set_visible(True)
         elif event.key == pygame.K_1:
             self.sound.button_sound()
             self.settings.level = 1
@@ -206,7 +210,7 @@ class AlienInvasion:
         self.bullets.empty()
 
         # Create a new fleet and center the ship
-        self._create_fleet()
+        self._create_fleet(self.settings.number_aliens_y, self.settings.number_aliens_x)
         self.ship.center_ship()
 
     def _fire_bullet(self):
@@ -246,8 +250,14 @@ class AlienInvasion:
     def _new_level(self):
         """Destroy existing bullets and create new fleet."""
         # Destroy existing bullets and create new fleet.
+        if self.stats.level % 5 == 0:
+            if self.settings.alien_random_limit != 1:
+                self.settings.alien_random_limit -= 2
+
+            if self.settings.aliens_screen < self.settings.alien_fit_total:
+                self.settings.aliens_screen += self.settings.number_aliens_x
         self.bullets.empty()
-        self._create_fleet()
+        self._create_fleet(self.settings.number_aliens_y, self.settings.number_aliens_x)
         self.settings.increase_speed()
 
         # Increase level
@@ -296,8 +306,8 @@ class AlienInvasion:
                 self._ship_hit()
                 break
 
-    def _create_fleet(self):
-        """Create the fleet of aliens"""
+    def _determine_aliens_enter(self):
+        """Find the number of aliens to fit in the screen."""
         # Create an alien and find the number of aliens in a row.
         # Spacing between each alien is equal to one alien width.
         alien = Alien(self)
@@ -311,10 +321,19 @@ class AlienInvasion:
                              (3 * alien_height) - ship_height)
         number_rows = available_space_y // (2 * alien_height)
 
+        self.settings.number_aliens_x = number_aliens_x
+        self.settings.number_aliens_y = number_rows
+        self.settings.alien_fit_total = number_aliens_x * number_rows
+
+    def _create_fleet(self, number_rows, number_aliens_x):
+        """Create the fleet of aliens"""
+        number = 1
         # Create the full fleet of aliens.
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
-                self._create_alien(alien_number, row_number)
+                if len(self.aliens) < self.settings.aliens_screen and number == 1:
+                    self._create_alien(alien_number, row_number)
+                number = randint(1, self.settings.alien_random_limit + 1)
 
     def _create_alien(self, alien_number, row_number):
         """Create an alien and place it in the row."""
