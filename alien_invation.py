@@ -26,6 +26,7 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption('Alien Invasion')
+        self.minimize_screen = False
 
         # Create an instance to store game statistics,
         # and create a scoreboard.
@@ -72,9 +73,9 @@ class AlienInvasion:
 
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             self._exit()
@@ -83,12 +84,24 @@ class AlienInvasion:
         elif event.key == pygame.K_p:
             if not self.stats.game_active:
                 self._start_game()
+        elif event.key == pygame.K_ESCAPE:
+            if not self.minimize_screen:
+                self._minimize_screen()
+        elif event.key == pygame.K_1:
+            self.sound.button_sound()
+            self.settings.level = 1
+        elif event.key == pygame.K_2:
+            self.sound.button_sound()
+            self.settings.level = 2
+        elif event.key == pygame.K_3:
+            self.sound.button_sound()
+            self.settings.level = 3
 
     def _check_keyup_events(self, event):
         """Respond to keypresses."""
-        if event.key == pygame.K_RIGHT:
+        if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
             self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
+        elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
             self.ship.moving_left = False
 
     def _check_mousebuttomdown_events(self):
@@ -119,6 +132,15 @@ class AlienInvasion:
         if play_button_clicked and self.settings.level:
             self.sound.button_sound()
             self._start_game()
+
+    def _minimize_screen(self):
+        """Minimize the screen."""
+        self.screen = pygame.display.set_mode((1000, 750))
+
+        self.ship.screen = self.screen
+        self.screen_rect = self.screen.get_rect()
+        self.ship.rect.midbottom = self.screen_rect.midbottom
+        self.minimize_screen = True
 
     def _start_game(self):
         """Start a new game."""
@@ -295,11 +317,12 @@ class AlienInvasion:
 
     def _draw_buttons(self):
         """Draw the play and level buttons."""
-        self.play_button.draw_button()
         if not self.settings.level:
             self.basic_button.draw_button()
             self.medium_button.draw_button()
             self.hard_button.draw_button()
+        else:
+            self.play_button.draw_button()
 
     def _exit(self):
         """Manege the exit of the game."""

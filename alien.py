@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from random import randint
 
 
 class Alien(Sprite):
@@ -12,8 +13,16 @@ class Alien(Sprite):
         self.settings = ai_game.settings
 
         # load the image and set its rect attribute.
-        self.image = pygame.image.load("images/alien.bmp")
-        self.rect = self.image.get_rect()
+        random_number = randint(1, 3)
+        if random_number == 1:
+            self.image = pygame.image.load("images/alien.bmp")
+            self.rect = self.image.get_rect()
+        elif random_number == 2:
+            self.image = pygame.image.load("images/alien_red.bmp")
+            self.rect = self.image.get_rect()
+        else:
+            self.image = pygame.image.load("images/alien_purple.bmp")
+            self.rect = self.image.get_rect()
 
         # Start each new alien near the top left of the screen.
         self.rect.x = self.rect.width

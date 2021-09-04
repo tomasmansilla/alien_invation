@@ -20,6 +20,7 @@ class Ship(Sprite):
 
         # Store a decimal value for the ship's horizontal position.
         self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
 
         # Movement flag
         self.moving_right = False
