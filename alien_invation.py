@@ -6,7 +6,7 @@ import pygame.mixer
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
-from button import Button, LevelButton
+from button import Button, LevelButton, SelectLevelButton
 from sound import Sound
 from ship import Ship
 from bullet import Bullet
@@ -40,6 +40,7 @@ class AlienInvasion:
         # Make the Play button.
         self.play_button = Button(self)
         # Make the Level Button.
+        self.select_level_button = SelectLevelButton(self)
         self.basic_button = LevelButton(self, 'images/easy.bmp', 1)
         self.medium_button = LevelButton(self, 'images/normal.bmp', 2)
         self.hard_button = LevelButton(self, 'images/hard.bmp', 3)
@@ -87,6 +88,8 @@ class AlienInvasion:
         elif event.key == pygame.K_ESCAPE:
             if not self.minimize_screen:
                 self._minimize_screen()
+        elif event.key == pygame.K_r:
+            self._start_game()
         elif event.key == pygame.K_1:
             self.sound.button_sound()
             self.settings.level = 1
@@ -318,6 +321,7 @@ class AlienInvasion:
     def _draw_buttons(self):
         """Draw the play and level buttons."""
         if not self.settings.level:
+            self.select_level_button.draw_button()
             self.basic_button.draw_button()
             self.medium_button.draw_button()
             self.hard_button.draw_button()

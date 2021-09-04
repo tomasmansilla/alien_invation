@@ -43,3 +43,34 @@ class LevelButton:
     def draw_button(self):
         """Draw the button"""
         self.screen.blit(self.image, self.image_rect)
+
+
+class SelectLevelButton:
+    """Display un select level button."""
+
+    def __init__(self, ai_game):
+        self.ai_game = ai_game
+        self.screen = ai_game.screen
+        self.screen_rect = self.screen.get_rect()
+        self.settings = ai_game.settings
+
+
+        # Font settings for the button.
+        self.text_color = (13, 45, 64)
+        self.font = pygame.font.SysFont(None, 72)
+
+        self._prep_button()
+
+    def _prep_button(self):
+        """Turn the text into a rendered image."""
+        text = "Please, select a level!"
+        self.text_image = self.font.render(text, True, self.text_color, self.settings.bg_color)
+        self.text_image_rect = self.text_image.get_rect()
+        self.text_image_rect.center = self.screen_rect.center
+
+
+    def draw_button(self):
+        """Draw the button on the screen."""
+        self.screen.blit(self.text_image, self.text_image_rect)
+
+
