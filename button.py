@@ -45,7 +45,7 @@ class LevelButton:
         self.screen.blit(self.image, self.image_rect)
 
 
-class SelectLevelButton:
+class SelectLevelImage:
     """Display un select level button."""
 
     def __init__(self, ai_game):
@@ -59,9 +59,9 @@ class SelectLevelButton:
         self.text_color = (13, 45, 64)
         self.font = pygame.font.SysFont(None, 72)
 
-        self._prep_button()
+        self._prep_image()
 
-    def _prep_button(self):
+    def _prep_image(self):
         """Turn the text into a rendered image."""
         text = "Please, select a level!"
         self.text_image = self.font.render(text, True, self.text_color, self.settings.bg_color)
@@ -69,8 +69,27 @@ class SelectLevelButton:
         self.text_image_rect.center = self.screen_rect.center
 
 
-    def draw_button(self):
+    def draw_image(self):
         """Draw the button on the screen."""
         self.screen.blit(self.text_image, self.text_image_rect)
+
+
+class ResumeButton:
+
+    def __init__(self, ai_game):
+        """Initialize button attributes."""
+        self.screen = ai_game.screen
+        self.screen_rect = self.screen.get_rect()
+
+        # Set the dimensions and properties of the button
+        self.image = pygame.image.load('images/resume.bmp')
+        self.image_rect = self.image.get_rect()
+
+        # Build the button's rect object and center it.
+        self.image_rect.center = self.screen_rect.center
+
+    def draw_button(self):
+        # Draw blank button and then draw message.
+        self.screen.blit(self.image, self.image_rect)
 
 

@@ -6,7 +6,7 @@ import pygame.mixer
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
-from button import Button, LevelButton, SelectLevelButton
+from button import Button, LevelButton, SelectLevelImage, ResumeButton
 from sound import Sound
 from ship import Ship
 from bullet import Bullet
@@ -26,7 +26,10 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption('Alien Invasion')
+
+        # Mode flags
         self.minimize_screen = False
+        self.pause_game = False
 
         # Create an instance to store game statistics,
         # and create a scoreboard.
@@ -39,8 +42,9 @@ class AlienInvasion:
 
         # Make the Play button.
         self.play_button = Button(self)
+        self.resume_button = ResumeButton(self)
         # Make the Level Button.
-        self.select_level_button = SelectLevelButton(self)
+        self.select_level_button = SelectLevelImage(self)
         self.basic_button = LevelButton(self, 'images/easy.bmp', 1)
         self.medium_button = LevelButton(self, 'images/normal.bmp', 2)
         self.hard_button = LevelButton(self, 'images/hard.bmp', 3)
@@ -83,13 +87,24 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
         elif event.key == pygame.K_p:
-            if not self.stats.game_active:
+            if not self.stats.game_active and not self.pause_game:
                 self._start_game()
+            elif not self.pause_game:
+                self._pause_game()
+            elif self.pause_game:
+                self._resume_game()
+
         elif event.key == pygame.K_ESCAPE:
             if not self.minimize_screen:
                 self._minimize_screen()
         elif event.key == pygame.K_r:
-            self._start_game()
+
+            self.bullets.empty()
+            self.aliens.empty()
+
+            self.stats.game_active = False
+            self.settings.level = 0
+            pygame.mouse.set_visible(True)
         elif event.key == pygame.K_1:
             self.sound.button_sound()
             self.settings.level = 1
@@ -109,9 +124,18 @@ class AlienInvasion:
 
     def _check_mousebuttomdown_events(self):
         mouse_pos = pygame.mouse.get_pos()
-        if not self.stats.game_active:
+        if not self.stats.game_active and not self.pause_game:
             self._check_level_selected(mouse_pos)
             self._check_play_button(mouse_pos)
+        if self.pause_game:
+            self._check_resume_button(mouse_pos)
+
+    def _check_resume_button(self, mouse_pos):
+        """Check if the resume button is pressed."""
+        resume_button_clicked = self.resume_button.image_rect.collidepoint(mouse_pos)
+
+        if resume_button_clicked:
+            self._resume_game()
 
     def _check_level_selected(self, mouse_pos):
         basic_button_clicked = self.basic_button.image_rect.collidepoint(mouse_pos)
@@ -144,6 +168,20 @@ class AlienInvasion:
         self.screen_rect = self.screen.get_rect()
         self.ship.rect.midbottom = self.screen_rect.midbottom
         self.minimize_screen = True
+
+    def _pause_game(self):
+        """Pause the game when p key is pressed."""
+        self.pause_game = True
+        self.sound.pause_music()
+        self.stats.game_active = False
+        pygame.mouse.set_visible(True)
+
+    def _resume_game(self):
+        """Resume the game if the game is in pause."""
+        self.pause_game = False
+        self.sound.resume_music()
+        pygame.mouse.set_visible(False)
+        self.stats.game_active = True
 
     def _start_game(self):
         """Start a new game."""
@@ -305,9 +343,10 @@ class AlienInvasion:
         """Updates images to the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
-        for bullet in self.bullets.sprites():
-            bullet.draw_bullet()
-        self.aliens.draw(self.screen)
+        if not self.pause_game:
+            for bullet in self.bullets.sprites():
+                bullet.draw_bullet()
+            self.aliens.draw(self.screen)
 
         # Draw the score information.
         self.sb.show_score()
@@ -321,12 +360,15 @@ class AlienInvasion:
     def _draw_buttons(self):
         """Draw the play and level buttons."""
         if not self.settings.level:
-            self.select_level_button.draw_button()
+            self.select_level_button.draw_image()
             self.basic_button.draw_button()
             self.medium_button.draw_button()
             self.hard_button.draw_button()
         else:
-            self.play_button.draw_button()
+            if not self.pause_game:
+                self.play_button.draw_button()
+            else:
+                self.resume_button.draw_button()
 
     def _exit(self):
         """Manege the exit of the game."""
