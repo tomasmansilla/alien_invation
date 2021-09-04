@@ -100,7 +100,7 @@ class AlienInvasion:
         if event.key == pygame.K_q:
             self._exit()
         elif event.key == pygame.K_p:
-            if not self.stats.game_active and not self.pause_game:
+            if not self.stats.game_active and not self.pause_game and self.settings.level:
                 self._start_game()
             elif not self.pause_game:
                 self._pause_game()
