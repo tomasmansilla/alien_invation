@@ -12,6 +12,8 @@ class GameStats:
 
         # Start Alien Invasion in an inactive state.
         self.game_active = False
+        self.pause_game = False
+        self.minimize_screen = False
 
         # High score should never be reset.
         self.high_score = None

@@ -7,7 +7,7 @@ from random import randint
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
-from button import Button, LevelButton, SelectLevelImage, ResumeButton
+from button import Button, LevelButton, SelectLevelImage
 from sound import Sound
 from ship import Ship
 from bullet import Bullet
@@ -28,10 +28,6 @@ class AlienInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption('Alien Invasion')
 
-        # Mode flags
-        self.minimize_screen = False
-        self.pause_game = False
-
         # Create an instance to store game statistics,
         # and create a scoreboard.
         self.stats = GameStats(self)
@@ -42,10 +38,10 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
 
         # Make the Play button.
-        self.play_button = Button(self)
-        self.resume_button = ResumeButton(self)
+        self.play_button = Button(self, 'images/play.bmp')
+        self.resume_button = Button(self, 'images/resume.bmp')
         # Make the Level Button.
-        self.select_level_button = SelectLevelImage(self)
+        self.select_level_button = SelectLevelImage(self,)
         self.basic_button = LevelButton(self, 'images/easy.bmp', 1)
         self.medium_button = LevelButton(self, 'images/normal.bmp', 2)
         self.hard_button = LevelButton(self, 'images/hard.bmp', 3)
@@ -81,7 +77,7 @@ class AlienInvasion:
 
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
-        if self.stats.game_active and not self.pause_game:
+        if self.stats.game_active and not self.stats.pause_game:
             if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 self.ship.moving_right = True
             elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
@@ -100,14 +96,15 @@ class AlienInvasion:
         if event.key == pygame.K_q:
             self._exit()
         elif event.key == pygame.K_p:
-            if not self.stats.game_active and not self.pause_game and self.settings.level:
+            if not self.stats.game_active and not self.stats.pause_game and self.settings.level:
                 self._start_game()
-            elif not self.pause_game:
+                print('hola')
+            elif not self.stats.pause_game:
                 self._pause_game()
-            elif self.pause_game:
+            elif self.stats.pause_game:
                 self._resume_game()
         elif event.key == pygame.K_ESCAPE:
-            if not self.minimize_screen:
+            if not self.stats.minimize_screen:
                 self._minimize_screen()
         elif event.key == pygame.K_1:
             self.sound.button_sound()
@@ -128,10 +125,10 @@ class AlienInvasion:
 
     def _check_mousebuttomdown_events(self):
         mouse_pos = pygame.mouse.get_pos()
-        if not self.stats.game_active and not self.pause_game:
+        if not self.stats.game_active and not self.stats.pause_game:
             self._check_level_selected(mouse_pos)
             self._check_play_button(mouse_pos)
-        if self.pause_game:
+        if self.stats.pause_game:
             self._check_resume_button(mouse_pos)
 
     def _check_resume_button(self, mouse_pos):
@@ -171,18 +168,18 @@ class AlienInvasion:
         self.ship.screen = self.screen
         self.screen_rect = self.screen.get_rect()
         self.ship.rect.midbottom = self.screen_rect.midbottom
-        self.minimize_screen = True
+        self.stats.minimize_screen = True
 
     def _pause_game(self):
         """Pause the game when p key is pressed."""
-        self.pause_game = True
+        self.stats.pause_game = True
         self.sound.pause_music()
         self.stats.game_active = False
         pygame.mouse.set_visible(True)
 
     def _resume_game(self):
         """Resume the game if the game is in pause."""
-        self.pause_game = False
+        self.stats.pause_game = False
         self.sound.resume_music()
         pygame.mouse.set_visible(False)
         self.stats.game_active = True
@@ -362,7 +359,7 @@ class AlienInvasion:
         """Updates images to the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
-        if not self.pause_game:
+        if not self.stats.pause_game:
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
             self.aliens.draw(self.screen)
@@ -384,7 +381,7 @@ class AlienInvasion:
             self.medium_button.draw_button()
             self.hard_button.draw_button()
         else:
-            if not self.pause_game:
+            if not self.stats.pause_game:
                 self.play_button.draw_button()
             else:
                 self.resume_button.draw_button()
