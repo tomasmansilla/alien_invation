@@ -26,7 +26,7 @@ class Sound:
         self.sound_shot.play()
 
     def game_over_sound(self):
-        self.sound_game_over.play()
+        self.sound_game_over.play(maxtime=400)
 
     def button_sound(self):
         self.sound_button.play()
