@@ -165,8 +165,10 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((1000, 750))
 
         self.ship.screen = self.screen
-        self.screen_rect = self.screen.get_rect()
-        self.ship.rect.midbottom = self.screen_rect.midbottom
+        self.ship.screen_rect = self.ship.screen.get_rect()
+        self.ship.rect.midbottom = self.ship.screen_rect.midbottom
+        self.ship.x = self.ship.rect.x
+        self.ship.y = self.ship.rect.y
         self.stats.minimize_screen = True
 
     def _pause_game(self):
