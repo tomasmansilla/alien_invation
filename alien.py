@@ -2,8 +2,6 @@ import pygame
 from pygame.sprite import Sprite
 from random import choice
 
-from bullet import Bullet
-
 
 class Alien(Sprite):
     """A class to represent a single alien in the fleet."""
