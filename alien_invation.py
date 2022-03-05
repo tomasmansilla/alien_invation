@@ -147,10 +147,10 @@ class AlienInvasion:
             self.settings.level = 1
         elif medium_button_clicked:
             self.sound.button_sound()
-            self.settings.level = 2
+            self.settings.level = 1.5
         elif hard_button_clicked:
             self.sound.button_sound()
-            self.settings.level = 3
+            self.settings.level = 2
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
