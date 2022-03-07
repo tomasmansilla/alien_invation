@@ -7,6 +7,7 @@ This is a project of [Python Crash Course, Second Edition](http://www.nostarch.c
 - [Overview](#overview)
   - [The project](#the-project)
   - [Screenshot](#screenshot)
+- [Usage](#usage)
 - [My process](#my-process)
   - [Built with](#built-with)
   - [What I learn](#what-i-learn)
@@ -24,6 +25,9 @@ This game has two main component:
 ### Screenshot
 ![](./images/screenshot/menu.png)
 ![](./images/screenshot/game.png)
+
+## Usage
+To play this game you should clone this repository and run alien_invation.py file
 
 ## My process
 
